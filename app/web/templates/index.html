@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenManus Web</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <!-- 引入代码高亮 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <!-- 引入字体图标 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- 引入Markdown解析器 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- 左侧文件树 -->
+      <div class="file-explorer">
+        <div class="file-explorer-header">
+          <h3>工作区文件</h3>
+          <div class="file-actions">
+            <button id="new-file-btn" title="新建文件">
+              <i class="fas fa-file-medical"></i>
+            </button>
+            <button id="new-folder-btn" title="新建文件夹">
+              <i class="fas fa-folder-plus"></i>
+            </button>
+            <button id="refresh-files" title="刷新文件列表">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+        <div class="file-tree" id="file-tree">
+          <div class="loading">加载中...</div>
+        </div>
+      </div>
+
+      <!-- 中间编辑区 -->
+      <div class="editor-container">
+        <div class="editor-header">
+          <span id="current-file-path">未打开文件</span>
+        </div>
+        <div class="editor-content" id="editor-content">
+          <div class="empty-editor">
+            <i class="fas fa-file-alt"></i>
+            <p>从左侧选择一个文件打开</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧聊天窗口 -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <h3>与 OpenManus 聊天</h3>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="welcome-message">
+            <div class="message system">
+              <div class="message-content">
+                👋 欢迎使用 OpenManus Web 界面！在这里，您可以与 AI
+                助手对话，管理工作区文件。
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <textarea
+            id="chat-input"
+            placeholder="输入消息，按 Shift+Enter 换行..."
+          ></textarea>
+          <button id="send-message" title="发送消息">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 引入 Socket.IO 客户端 -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <!-- 引入自定义脚本 -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    <script>
+      // 页面加载完成后显示欢迎提示
+      document.addEventListener("DOMContentLoaded", function () {
+        // 延迟500ms显示欢迎提示，以便等待toast系统初始化
+        setTimeout(() => {
+          if (typeof toast !== "undefined") {
+            toast.info("欢迎使用OpenManus Web界面", { duration: 5000 });
+          }
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

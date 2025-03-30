@@ -1,0 +1,1157 @@
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --background-color: #f8f9fa;
+    --border-color: #e0e0e0;
+    --text-color: #333;
+    --light-text: #666;
+    --user-message-bg: #e3f2fd;
+    --assistant-message-bg: #f1f1f1;
+    --system-message-bg: #fff3cd;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 主容器 */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* 文件浏览器 */
+.file-explorer {
+    width: 20%;
+    height: 100%;
+    border-right: 1px solid var(--border-color);
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.file-explorer-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-explorer-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.file-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.file-explorer-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--light-text);
+    padding: 5px;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-explorer-header button:hover {
+    background-color: var(--border-color);
+    color: var(--primary-color);
+}
+
+.file-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--light-text);
+}
+
+/* 文件树样式 */
+.directory, .file {
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.directory > .directory-name {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.directory > .directory-name:hover {
+    background-color: #f0f0f0;
+}
+
+.directory-name i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.directory-children {
+    margin-left: 20px;
+    overflow: hidden;
+}
+
+.file {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.file:hover {
+    background-color: #f0f0f0;
+}
+
+.file i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.file.active {
+    background-color: #e3f2fd;
+}
+
+/* 上下文菜单样式 */
+.context-menu {
+    position: fixed;
+    z-index: 1000;
+    width: 200px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-item i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.menu-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 5px 0;
+}
+
+/* 拖拽样式 */
+.dragging {
+    opacity: 0.5;
+}
+
+.drag-over {
+    background-color: #e3f2fd;
+    border-radius: 4px;
+    outline: 2px dashed #2196f3;
+}
+
+/* 通知样式 */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transition: opacity 0.3s;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+.notification.error {
+    background-color: #f44336;
+}
+
+.notification i {
+    margin-right: 8px;
+}
+
+.notification.hide {
+    opacity: 0;
+}
+
+/* 编辑器区域 */
+.editor-container {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+}
+
+.editor-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f5f5f5;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.editor-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: white;
+    position: relative;
+}
+
+.empty-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--light-text);
+}
+
+.empty-editor i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.code-block {
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    padding: 15px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid #eaeaea;
+}
+
+/* 聊天区域 */
+.chat-container {
+    width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f5f5f5;
+}
+
+.chat-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    margin-bottom: 20px;
+    max-width: 90%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.message.user {
+    align-self: flex-end;
+    background-color: var(--user-message-bg);
+    margin-left: auto;
+    border-bottom-right-radius: 0;
+}
+
+.message.assistant {
+    background-color: var(--assistant-message-bg);
+    border-bottom-left-radius: 0;
+}
+
+.message.system {
+    background-color: var(--system-message-bg);
+    max-width: 100%;
+}
+
+.message .message-content {
+    word-wrap: break-word;
+}
+
+.message .message-content p {
+    margin-bottom: 0.5rem;
+}
+
+.message .message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.thinking {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.thinking i {
+    margin-right: 8px;
+    color: #6f42c1;
+}
+
+.chat-input-container {
+    padding: 10px 15px;
+    border-top: 1px solid var(--border-color);
+    background-color: white;
+    display: flex;
+    align-items: center;
+}
+
+.chat-input-container textarea {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    resize: none;
+    height: 60px;
+    font-family: inherit;
+}
+
+.chat-input-container textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.chat-input-container button {
+    margin-left: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chat-input-container button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .file-explorer {
+        width: 25%;
+    }
+
+    .chat-container {
+        width: 35%;
+    }
+}
+
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .file-explorer, .editor-container, .chat-container {
+        width: 100%;
+        height: auto;
+    }
+
+    .file-explorer {
+        height: 30vh;
+    }
+
+    .editor-container {
+        height: 40vh;
+    }
+
+    .chat-container {
+        height: 30vh;
+    }
+}
+
+/* 编辑器工具栏 */
+.editor-toolbar {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: 10px;
+}
+
+.editor-toolbar button {
+    padding: 6px 12px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+}
+
+.editor-toolbar button:hover {
+    background-color: #f0f0f0;
+}
+
+.editor-toolbar button i {
+    font-size: 0.9rem;
+}
+
+.editor-toolbar button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 编辑器内容容器 */
+.editor-content-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    background-color: white;
+}
+
+/* 文件编辑器 */
+.file-editor {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 15px;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    tab-size: 4;
+}
+
+/* Markdown预览样式 */
+.markdown-preview {
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.markdown-preview h1 {
+    font-size: 2rem;
+    margin: 1.5rem 0 1rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #eaecef;
+}
+
+.markdown-preview h2 {
+    font-size: 1.5rem;
+    margin: 1.2rem 0 0.8rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid #eaecef;
+}
+
+.markdown-preview h3 {
+    font-size: 1.2rem;
+    margin: 1rem 0 0.6rem;
+}
+
+.markdown-preview p {
+    margin-bottom: 1rem;
+}
+
+.markdown-preview ul, .markdown-preview ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.markdown-preview blockquote {
+    padding: 0 1rem;
+    color: #6a737d;
+    border-left: 0.25rem solid #dfe2e5;
+    margin: 0 0 1rem;
+}
+
+.markdown-preview pre {
+    padding: 1rem;
+    overflow: auto;
+    background-color: #f6f8fa;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+}
+
+.markdown-preview code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    background-color: rgba(27,31,35,0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+/* HTML预览样式 */
+.html-preview {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.html-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: white;
+}
+
+/* 空内容提示 */
+.empty-content {
+    padding: 20px;
+    text-align: center;
+    color: var(--light-text);
+    font-style: italic;
+}
+
+/* 加载动画 */
+.fa-spin {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 在聊天区域添加日志消息样式 */
+.message.system.log-message {
+    background-color: #f8f9fa;
+    border-left: 3px solid #6c757d;
+    margin: 10px 0;
+}
+
+.message.system.log-message .log-entry {
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.message.system.log-message .log-entry-header {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: white;
+}
+
+.message.system.log-message .log-entry-header i {
+    margin-right: 8px;
+}
+
+.message.system.log-message .log-entry-content {
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.message.system.log-message .log-entry-content pre {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* 思考日志 */
+.message.system.log-message .log-thoughts .log-entry-header {
+    background-color: #6f42c1;
+}
+
+.message.system.log-message .log-thoughts .log-entry-header i {
+    color: #e9d8fd;
+}
+
+/* 工具参数和执行日志 */
+.message.system.log-message .log-tool_args .log-entry-header,
+.message.system.log-message .log-activating_tool .log-entry-header,
+.message.system.log-message .log-tool_result .log-entry-header {
+    background-color: #0d6efd;
+}
+
+.message.system.log-message .log-tool_args .log-entry-header i,
+.message.system.log-message .log-activating_tool .log-entry-header i,
+.message.system.log-message .log-tool_result .log-entry-header i {
+    color: #cfe2ff;
+}
+
+/* Token使用情况日志 */
+.message.system.log-message .log-token_usage .log-entry-header {
+    background-color: #20c997;
+}
+
+.message.system.log-message .log-token_usage .log-entry-header i {
+    color: #d1f5ea;
+}
+
+/* 日志内容的Markdown样式 */
+.log-entry-content.markdown-content {
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    max-height: none;
+    overflow: visible;
+}
+
+.log-entry-content.markdown-content h1,
+.log-entry-content.markdown-content h2,
+.log-entry-content.markdown-content h3,
+.log-entry-content.markdown-content h4,
+.log-entry-content.markdown-content h5,
+.log-entry-content.markdown-content h6 {
+    margin-top: 0.8em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+}
+
+.log-entry-content.markdown-content h3 {
+    font-size: 1.1em;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+}
+
+.log-entry-content.markdown-content p {
+    margin-bottom: 0.8em;
+    line-height: 1.5;
+}
+
+.log-entry-content.markdown-content ul,
+.log-entry-content.markdown-content ol {
+    margin-left: 1.5em;
+    margin-bottom: 0.8em;
+}
+
+.log-entry-content.markdown-content li {
+    margin-bottom: 0.3em;
+}
+
+.log-entry-content.markdown-content code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+}
+
+.log-entry-content.markdown-content pre {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.8em;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0.8em 0;
+}
+
+.log-entry-content.markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.log-entry-content.markdown-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8em 0;
+    background-color: white;
+}
+
+.log-entry-content.markdown-content table th,
+.log-entry-content.markdown-content table td {
+    border: 1px solid #ddd;
+    padding: 0.5em 0.8em;
+    text-align: left;
+}
+
+.log-entry-content.markdown-content table th {
+    background-color: #f0f2f5;
+    font-weight: 600;
+}
+
+.log-entry-content.markdown-content table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.log-entry-content.markdown-content strong {
+    font-weight: 600;
+}
+
+.log-entry-content.markdown-content em {
+    font-style: italic;
+}
+
+/* 在日志标题中添加"任务完成"提示 */
+.log-entry-content.markdown-content .task-complete {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 0.5em;
+    border-radius: 4px;
+    margin-top: 1em;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* 为特定日志类型添加样式 */
+.log-type-thoughts .markdown-content {
+    background-color: #f8f0ff;
+    font-size: 0.95em;
+    line-height: 1.6;
+    max-height: none !important;
+    overflow: visible;
+}
+
+.log-type-thoughts .markdown-content h3 {
+    font-size: 1.1em;
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+    color: #6f42c1;
+    font-weight: 600;
+    border-bottom: 1px solid #e1d5f0;
+    padding-bottom: 0.3em;
+}
+
+.log-type-thoughts .markdown-content p {
+    margin-bottom: 0.7em;
+    line-height: 1.6;
+    color: #333;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+.log-type-thoughts .markdown-content ul,
+.log-type-thoughts .markdown-content ol {
+    margin-left: 1.5em;
+    margin-bottom: 0.8em;
+    padding-left: 0.5em;
+}
+
+.log-type-thoughts .markdown-content li {
+    margin-bottom: 0.4em;
+    line-height: 1.5;
+}
+
+.log-type-thoughts .markdown-content strong {
+    color: #6f42c1;
+    font-weight: 600;
+}
+
+.log-type-thoughts .markdown-content code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+    background-color: rgba(111, 66, 193, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    color: #6f42c1;
+}
+
+.log-type-thoughts .markdown-content pre {
+    margin: 0.8em 0;
+    padding: 12px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    border: 1px solid #e1d5f0;
+    overflow-x: auto;
+}
+
+.log-type-thoughts .markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #24292e;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* 确保所有日志内容容器都可以完整显示内容 */
+.log-entry-content.markdown-content {
+    max-height: none;
+    overflow: visible;
+}
+
+/* 为特定日志类型添加样式 */
+.log-type-tool_args .markdown-content {
+    background-color: #e7f5ff;
+}
+
+.log-type-tool_args .markdown-content h2 {
+    font-size: 1.2em;
+    margin-top: 0;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #b3d9ff;
+    color: #0366d6;
+}
+
+.log-type-tool_args .markdown-content h3 {
+    font-size: 1.1em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #0366d6;
+}
+
+.log-type-tool_args .markdown-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.9em;
+}
+
+.log-type-tool_args .markdown-content table th,
+.log-type-tool_args .markdown-content table td {
+    padding: 8px 12px;
+    border: 1px solid #cce5ff;
+}
+
+.log-type-tool_args .markdown-content table th {
+    background-color: #e7f5ff;
+    font-weight: 600;
+    text-align: left;
+}
+
+.log-type-tool_args .markdown-content table td:first-child {
+    width: 30%;
+    font-weight: 500;
+}
+
+.log-type-tool_args .markdown-content code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    color: #032f62;
+}
+
+.log-type-tool_args .markdown-content pre {
+    margin: 0.8em 0;
+    padding: 12px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    border: 1px solid #e1e4e8;
+    overflow-x: auto;
+}
+
+.log-type-tool_args .markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #24292e;
+    display: block;
+    line-height: 1.5;
+}
+
+.log-type-tool_args .markdown-content hr {
+    margin: 1.5em 0;
+    border: 0;
+    height: 1px;
+    background-color: #b3d9ff;
+}
+
+.log-type-tool_args .markdown-content ul {
+    margin-left: 1.5em;
+    padding-left: 0;
+}
+
+.log-type-tool_args .markdown-content li {
+    margin-bottom: 0.5em;
+}
+
+.log-type-tool_args .markdown-content strong {
+    color: #0366d6;
+}
+
+/* 增强其他日志内容样式 */
+.markdown-content pre code.language-html,
+.log-type-tool_args .markdown-content pre code.language-html {
+    color: #22863a;
+}
+
+.markdown-content pre code.language-javascript,
+.log-type-tool_args .markdown-content pre code.language-javascript {
+    color: #24292e;
+}
+
+.markdown-content pre code.language-python,
+.log-type-tool_args .markdown-content pre code.language-python {
+    color: #0366d6;
+}
+
+.markdown-content pre code.language-css,
+.log-type-tool_args .markdown-content pre code.language-css {
+    color: #6f42c1;
+}
+
+.log-type-token_usage .markdown-content {
+    background-color: #e6fcf5;
+}
+
+.log-type-tool_result .markdown-content {
+    background-color: #fff9db;
+}
+
+.log-type-task_complete .markdown-content {
+    background-color: #d4edda;
+}
+
+.log-type-task_complete .log-entry-header {
+    background-color: #28a745 !important;
+}
+
+.log-type-task_complete .log-entry-header i {
+    color: #fff !important;
+}
+
+/* 模态框样式 */
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.modal-container.show {
+    opacity: 1;
+}
+
+.modal-content {
+    width: 400px;
+    max-width: 90%;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-container.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-title {
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f8f9fa;
+}
+
+.modal-message {
+    padding: 20px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.modal-input {
+    width: calc(100% - 40px);
+    margin: 0 20px 20px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    background-color: #f8f9fa;
+}
+
+.modal-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 10px;
+}
+
+.modal-button-cancel {
+    background-color: #f1f2f3;
+    color: #666;
+}
+
+.modal-button-cancel:hover {
+    background-color: #e2e3e4;
+}
+
+.modal-button-confirm {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modal-button-confirm:hover {
+    background-color: var(--secondary-color);
+}
+
+/* 浮动提示框 */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 300px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+
+.toast {
+    background-color: #333;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+    transform: translateX(120%);
+    opacity: 0;
+    overflow: hidden;
+    position: relative;
+    max-width: 100%;
+    pointer-events: auto;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.hide {
+    opacity: 0;
+    transform: translateX(120%);
+}
+
+.toast-success {
+    background-color: #28a745;
+    border-left: 4px solid #1e7e34;
+}
+
+.toast-info {
+    background-color: #17a2b8;
+    border-left: 4px solid #117a8b;
+}
+
+.toast-warning {
+    background-color: #ffc107;
+    border-left: 4px solid #d39e00;
+    color: #212529;
+}
+
+.toast-error {
+    background-color: #dc3545;
+    border-left: 4px solid #bd2130;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+}
+
+.toast-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 0%;
+    transition: width linear;
+}
+
+.toast-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: pointer;
+    font-size: 0.8em;
+    opacity: 0.6;
+}
+
+.toast-close:hover {
+    opacity: 1;
+}
