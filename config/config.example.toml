@@ -31,6 +31,14 @@ temperature = 0.0                          # Controls randomness
 # max_tokens = 4096
 # temperature = 0.0
 
+# [llm] #Jiekou.AI:
+# api_type = 'jiekou'
+# model = "claude-sonnet-4-5-20250929"                               # The LLM model to use
+# base_url = "https://api.jiekou.ai/openai"                          # API endpoint URL
+# api_key = "your Jiekou.AI api key"                                 # Your API key
+# max_tokens = 64000                                                 # Maximum number of tokens in the response
+# temperature = 0.0                                                  # Controls randomness
+
 # Optional configuration for specific LLM models
 [llm.vision]
 model = "claude-3-7-sonnet-20250219"       # The vision model to use
@@ -98,3 +106,8 @@ temperature = 0.0                          # Controls randomness for vision mode
 # MCP (Model Context Protocol) configuration
 [mcp]
 server_reference = "app.mcp.server" # default server module reference
+
+# Optional Runflow configuration
+# Your can add additional agents into run-flow workflow to solve different-type tasks.
+[runflow]
+use_data_analysis_agent = false     # The Data Analysi Agent to solve various data analysis tasks

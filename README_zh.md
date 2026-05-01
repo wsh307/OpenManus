@@ -4,11 +4,12 @@
 
 [English](README.md) | 中文 | [한국어](README_ko.md) | [日本語](README_ja.md)
 
-[![GitHub stars](https://img.shields.io/github/stars/mannaandpoem/OpenManus?style=social)](https://github.com/mannaandpoem/OpenManus/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/FoundationAgents/OpenManus?style=social)](https://github.com/FoundationAgents/OpenManus/stargazers)
 &ensp;
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) &ensp;
 [![Discord Follow](https://dcbadge.vercel.app/api/server/DYn29wFk9z?style=flat)](https://discord.gg/DYn29wFk9z)
 [![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/lyh-917/OpenManusDemo)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15186407.svg)](https://doi.org/10.5281/zenodo.15186407)
 
 # 👋 OpenManus
 
@@ -43,7 +44,7 @@ conda activate open_manus
 2. 克隆仓库：
 
 ```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
+git clone https://github.com/FoundationAgents/OpenManus.git
 cd OpenManus
 ```
 
@@ -64,7 +65,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 2. 克隆仓库：
 
 ```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
+git clone https://github.com/FoundationAgents/OpenManus.git
 cd OpenManus
 ```
 
@@ -137,6 +138,17 @@ python run_mcp.py
 python run_flow.py
 ```
 
+## 添加自定义多智能体
+
+目前除了通用的 OpenManus Agent, 我们还内置了DataAnalysis Agent，适用于数据分析和数据可视化任务，你可以在`config.toml`中将这个智能体加入到`run_flow`中
+```toml
+# run-flow可选配置
+[runflow]
+use_data_analysis_agent = true     # 默认关闭，将其改为true则为激活
+```
+除此之外，你还需要安装相关的依赖来确保智能体正常运行：[具体安装指南](app/tool/chart_visualization/README_zh.md##安装)
+
+
 ## 贡献指南
 
 我们欢迎任何友好的建议和有价值的贡献！可以直接创建 issue 或提交 pull request。
@@ -155,7 +167,7 @@ python run_flow.py
 
 ## Star 数量
 
-[![Star History Chart](https://api.star-history.com/svg?repos=mannaandpoem/OpenManus&type=Date)](https://star-history.com/#mannaandpoem/OpenManus&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=FoundationAgents/OpenManus&type=Date)](https://star-history.com/#FoundationAgents/OpenManus&Date)
 
 
 ## 赞助商
@@ -173,15 +185,14 @@ python run_flow.py
 
 OpenManus 由 MetaGPT 社区的贡献者共同构建，感谢这个充满活力的智能体开发者社区！
 
-## 引用我们
-
+## 引用
 ```bibtex
 @misc{openmanus2025,
-  author = {Xinbin Liang and Jinyu Xiang and Zhaoyang Yu and Jiayi Zhang and Sirui Hong},
+  author = {Xinbin Liang and Jinyu Xiang and Zhaoyang Yu and Jiayi Zhang and Sirui Hong and Sheng Fan and Xiao Tang},
   title = {OpenManus: An open-source framework for building general AI agents},
   year = {2025},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/mannaandpoem/OpenManus}},
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.15186407},
+  url = {https://doi.org/10.5281/zenodo.15186407},
 }
 ```

@@ -1,3 +1,4 @@
+import json
 import threading
 import tomllib
 from pathlib import Path
@@ -59,6 +60,12 @@ class SearchSettings(BaseModel):
     )
 
 
+class RunflowSettings(BaseModel):
+    use_data_analysis_agent: bool = Field(
+        default=False, description="Enable data analysis agent in run flow"
+    )
+
+
 class BrowserSettings(BaseModel):
     headless: bool = Field(False, description="Whether to run browser in headless mode")
     disable_security: bool = Field(
@@ -98,12 +105,70 @@ class SandboxSettings(BaseModel):
     )
 
 
+class DaytonaSettings(BaseModel):
+    daytona_api_key: str
+    daytona_server_url: Optional[str] = Field(
+        "https://app.daytona.io/api", description=""
+    )
+    daytona_target: Optional[str] = Field("us", description="enum ['eu', 'us']")
+    sandbox_image_name: Optional[str] = Field("whitezxj/sandbox:0.1.0", description="")
+    sandbox_entrypoint: Optional[str] = Field(
+        "/usr/bin/supervisord -n -c /etc/supervisor/conf.d/supervisord.conf",
+        description="",
+    )
+    # sandbox_id: Optional[str] = Field(
+    #     None, description="ID of the daytona sandbox to use, if any"
+    # )
+    VNC_password: Optional[str] = Field(
+        "123456", description="VNC password for the vnc service in sandbox"
+    )
+
+
+class MCPServerConfig(BaseModel):
+    """Configuration for a single MCP server"""
+
+    type: str = Field(..., description="Server connection type (sse or stdio)")
+    url: Optional[str] = Field(None, description="Server URL for SSE connections")
+    command: Optional[str] = Field(None, description="Command for stdio connections")
+    args: List[str] = Field(
+        default_factory=list, description="Arguments for stdio command"
+    )
+
+
 class MCPSettings(BaseModel):
     """Configuration for MCP (Model Context Protocol)"""
 
     server_reference: str = Field(
         "app.mcp.server", description="Module reference for the MCP server"
     )
+    servers: Dict[str, MCPServerConfig] = Field(
+        default_factory=dict, description="MCP server configurations"
+    )
+
+    @classmethod
+    def load_server_config(cls) -> Dict[str, MCPServerConfig]:
+        """Load MCP server configuration from JSON file"""
+        config_path = PROJECT_ROOT / "config" / "mcp.json"
+
+        try:
+            config_file = config_path if config_path.exists() else None
+            if not config_file:
+                return {}
+
+            with config_file.open() as f:
+                data = json.load(f)
+                servers = {}
+
+                for server_id, server_config in data.get("mcpServers", {}).items():
+                    servers[server_id] = MCPServerConfig(
+                        type=server_config["type"],
+                        url=server_config.get("url"),
+                        command=server_config.get("command"),
+                        args=server_config.get("args", []),
+                    )
+                return servers
+        except Exception as e:
+            raise ValueError(f"Failed to load MCP server config: {e}")
 
 
 class AppConfig(BaseModel):
@@ -118,6 +183,12 @@ class AppConfig(BaseModel):
         None, description="Search configuration"
     )
     mcp_config: Optional[MCPSettings] = Field(None, description="MCP configuration")
+    run_flow_config: Optional[RunflowSettings] = Field(
+        None, description="Run flow configuration"
+    )
+    daytona_config: Optional[DaytonaSettings] = Field(
+        None, description="Daytona configuration"
+    )
 
     class Config:
         arbitrary_types_allowed = True
@@ -219,14 +290,26 @@ class Config:
             sandbox_settings = SandboxSettings(**sandbox_config)
         else:
             sandbox_settings = SandboxSettings()
+        daytona_config = raw_config.get("daytona", {})
+        if daytona_config:
+            daytona_settings = DaytonaSettings(**daytona_config)
+        else:
+            daytona_settings = DaytonaSettings()
 
         mcp_config = raw_config.get("mcp", {})
         mcp_settings = None
         if mcp_config:
+            # Load server configurations from JSON
+            mcp_config["servers"] = MCPSettings.load_server_config()
             mcp_settings = MCPSettings(**mcp_config)
         else:
-            mcp_settings = MCPSettings()
+            mcp_settings = MCPSettings(servers=MCPSettings.load_server_config())
 
+        run_flow_config = raw_config.get("runflow")
+        if run_flow_config:
+            run_flow_settings = RunflowSettings(**run_flow_config)
+        else:
+            run_flow_settings = RunflowSettings()
         config_dict = {
             "llm": {
                 "default": default_settings,
@@ -239,6 +322,8 @@ class Config:
             "browser_config": browser_settings,
             "search_config": search_settings,
             "mcp_config": mcp_settings,
+            "run_flow_config": run_flow_settings,
+            "daytona_config": daytona_settings,
         }
 
         self._config = AppConfig(**config_dict)
@@ -252,6 +337,10 @@ class Config:
         return self._config.sandbox
 
     @property
+    def daytona(self) -> DaytonaSettings:
+        return self._config.daytona_config
+
+    @property
     def browser_config(self) -> Optional[BrowserSettings]:
         return self._config.browser_config
 
@@ -263,6 +352,11 @@ class Config:
     def mcp_config(self) -> MCPSettings:
         """Get the MCP configuration"""
         return self._config.mcp_config
+
+    @property
+    def run_flow_config(self) -> RunflowSettings:
+        """Get the Run Flow configuration"""
+        return self._config.run_flow_config
 
     @property
     def workspace_root(self) -> Path:
